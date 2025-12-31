@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AEGIS CORE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{
+  background:radial-gradient(circle at top, #020617, #000);
+  color:#f8fafc;
+}
+.glass{
+  background:rgba(15,23,42,.65);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.1);
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="fixed top-0 w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+    <!-- LOGO -->
+    <div class="flex items-center gap-3 font-bold tracking-wide">
+      <div class="w-9 h-9 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400">
+        🛡
+      </div>
+      AEGIS <span class="text-sky-400">CORE</span>
+    </div>
+
+    <!-- MENU -->
+    <div class="hidden md:flex gap-8 text-sm tracking-widest text-slate-300">
+      <a href="index.html" class="text-sky-400">HOME</a>
+      <a href="dashboard.html">MONITOR</a>
+      <a href="#">INNOVATION</a>
+      <a href="#">RESPONSE</a>
+    </div>
+
+    <!-- USER -->
+    <div class="flex items-center gap-4">
+      🔔
+      <div class="px-4 py-2 rounded-full border border-white/20 text-xs">
+        SEC_ALPHA
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ================= HERO / LANDING ================= -->
+<section class="min-h-screen flex flex-col justify-center items-center text-center px-6 pt-24">
+
+  <span class="mb-6 px-6 py-2 rounded-full bg-sky-500/10 text-sky-400 text-xs tracking-widest">
+    IOT PROTOTYPE ACTIVE // NODEMCU ESP8266
+  </span>
+
+  <h1 class="text-5xl md:text-7xl font-black leading-tight">
+    SMART WOMEN SAFETY <span class="text-sky-400">CORRIDORS MONITORING</span><br>
+    <span class="text-slate-300">AND ALERT SYSTEM</span>
+  </h1>
+
+  <p class="mt-6 max-w-2xl text-slate-400 text-lg">
+    The Aegis IoT System utilizes ultrasonic, motion, and chemical sensors
+    to provide a comprehensive safety shield with real-time corridor monitoring.
+  </p>
+
+  <div class="mt-10 flex gap-6 flex-wrap justify-center">
+
+    <!-- MAIN BUTTON -->
+    <a href="dashboard.html"
+       class="px-10 py-4 bg-sky-500 hover:bg-sky-600 text-black font-bold rounded-full transition">
+      ENTER COMMAND DASHBOARD →
+    </a>
+
+    <!-- SECONDARY -->
+    <button class="px-10 py-4 border border-white/20 rounded-full hover:bg-white/5">
+      HARDWARE SPEC SHEET
+    </button>
+
+  </div>
+</section>
+
+</body>
+</html>

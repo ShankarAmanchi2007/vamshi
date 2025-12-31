@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AEGIS CORE | Hardware Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{
+  background:#020617;
+  color:#f8fafc;
+  scroll-behavior:smooth;
+}
+.glass{
+  background:rgba(15,23,42,.65);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.1);
+}
+.alert-blink{
+  animation:blink 0.6s infinite;
+}
+@keyframes blink{
+  0%,100%{background:#020617;}
+  50%{background:#991b1b;}
+}
+
+/* STATUS DOTS */
+.status-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  display:inline-block;
+}
+.status-normal{ background:#22c55e; }   /* green */
+.status-warning{ background:#eab308; }  /* yellow */
+.status-alert{ background:#ef4444; }    /* red */
+</style>
+</head>
+
+<body id="body">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="fixed top-0 w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3 font-bold">
+      🛡 AEGIS <span class="text-sky-400">CORE</span>
+    </div>
+    <div class="hidden md:flex gap-8 text-sm tracking-widest text-slate-300">
+      <a href="index.html">HOME</a>
+      <a href="#monitor" class="text-sky-400">MONITOR</a>
+      <a href="#architecture">INNOVATION</a>
+      <a href="#response">RESPONSE</a>
+    </div>
+    <div class="flex items-center gap-4">
+      🔔 <span class="text-xs border px-3 py-1 rounded-full">SEC_ALPHA</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= DASHBOARD ================= -->
+<section id="monitor" class="pt-32 px-6 pb-20 max-w-7xl mx-auto">
+
+<h1 class="text-3xl font-black mb-1">HARDWARE NODES DASHBOARD</h1>
+<p class="text-slate-400 mb-10">NodeMCU Core Monitoring</p>
+
+<div class="grid md:grid-cols-4 gap-6">
+
+<!-- PIR -->
+<div class="glass p-6 rounded-2xl">
+  <div class="flex items-center justify-between">
+    <h3 class="text-slate-400 text-sm flex items-center gap-2">
+      <span id="pirStatus" class="status-dot status-normal"></span>
+      PIR MOTION
+    </h3>
+  </div>
+  <p id="pirValue" class="text-3xl font-bold mt-2">None</p>
+</div>
+
+<!-- ULTRASONIC -->
+<div class="glass p-6 rounded-2xl">
+  <h3 class="text-slate-400 text-sm flex items-center gap-2">
+    <span id="ultraStatus" class="status-dot status-normal"></span>
+    ULTRASONIC
+  </h3>
+  <p id="ultraValue" class="text-3xl font-bold mt-2">NaN <span class="text-sm">cm</span></p>
+</div>
+
+<!-- IR -->
+<div class="glass p-6 rounded-2xl">
+  <h3 class="text-slate-400 text-sm flex items-center gap-2">
+    <span id="irStatus" class="status-dot status-normal"></span>
+    IR OBSTACLE
+  </h3>
+  <p id="irValue" class="text-3xl font-bold mt-2">Clear</p>
+</div>
+
+<!-- SOUND -->
+<div class="glass p-6 rounded-2xl">
+  <h3 class="text-slate-400 text-sm flex items-center gap-2">
+    <span id="soundStatus" class="status-dot status-normal"></span>
+    SOUND LEVEL
+  </h3>
+  <p id="soundValue" class="text-3xl font-bold mt-2">NaN <span class="text-sm">dB</span></p>
+</div>
+
+<!-- LDR -->
+<div class="glass p-6 rounded-2xl">
+  <h3 class="text-slate-400 text-sm flex items-center gap-2">
+    <span id="ldrStatus" class="status-dot status-normal"></span>
+    LDR AMBIENT
+  </h3>
+  <p id="ldrValue" class="text-3xl font-bold mt-2">1000 <span class="text-sm">lux</span></p>
+</div>
+
+<!-- MQ2 -->
+<div class="glass p-6 rounded-2xl">
+  <h3 class="text-slate-400 text-sm flex items-center gap-2">
+    <span id="mq2Status" class="status-dot status-normal"></span>
+    MQ-2 GAS
+  </h3>
+  <p id="mq2Value" class="text-3xl font-bold mt-2">NaN <span class="text-sm">ppm</span></p>
+</div>
+
+<!-- SOS -->
+<div class="glass p-6 rounded-2xl md:col-span-2">
+  <h3 class="text-slate-400 text-sm flex items-center gap-2">
+    <span id="sosStatus" class="status-dot status-normal"></span>
+    SOS BUTTON
+  </h3>
+  <p class="text-3xl font-bold mt-2">Ready</p>
+  <button onclick="triggerAlert('⚠ EMERGENCY SOS ALERT ⚠'); setStatus('sosStatus','alert')"
+    class="mt-6 w-full bg-red-700 py-4 rounded font-bold animate-pulse">
+    PRESS EMERGENCY SOS
+  </button>
+</div>
+
+</div>
+</section>
+
+<!-- ================= EVENT LOG ================= -->
+<section class="px-6 pb-20 max-w-7xl mx-auto">
+<h2 class="text-2xl font-bold mb-4">EVENT LOG</h2>
+<div id="eventLog" class="glass rounded-xl p-4 h-64 overflow-y-auto text-sm text-slate-300">
+<p class="text-slate-500">Waiting for sensor activity...</p>
+</div>
+</section>
+
+<!-- ================= ALERT ================= -->
+<div id="alertBox" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+<div class="glass p-10 rounded-xl text-center">
+<h1 id="alertText" class="text-4xl font-bold text-red-500 mb-6">ALERT</h1>
+<button onclick="clearAlert()" class="px-6 py-2 bg-slate-800 rounded">CLEAR ALERT</button>
+</div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+const body=document.getElementById("body");
+const alertBox=document.getElementById("alertBox");
+const alertText=document.getElementById("alertText");
+const logBox=document.getElementById("eventLog");
+
+function logEvent(msg){
+  const time=new Date().toLocaleTimeString();
+  logBox.innerHTML=`<div>[${time}] ${msg}</div>`+logBox.innerHTML;
+}
+
+function setStatus(id,state){
+  const el=document.getElementById(id);
+  el.className="status-dot status-"+state;
+}
+
+function triggerAlert(msg){
+  body.classList.add("alert-blink");
+  alertText.innerText=msg;
+  alertBox.classList.remove("hidden");
+  logEvent(msg);
+}
+
+function clearAlert(){
+  body.classList.remove("alert-blink");
+  alertBox.classList.add("hidden");
+}
+
+/* ===== SENSOR UPDATE FUNCTIONS (ESP8266 READY) ===== */
+
+function updatePIR(val){
+  document.getElementById("pirValue").innerText=val?"Motion Detected":"None";
+  setStatus("pirStatus", val?"alert":"normal");
+  logEvent("PIR Motion: "+(val?"DETECTED":"Idle"));
+  if(val) triggerAlert("⚠ MOTION DETECTED ⚠");
+}
+
+function updateUltrasonic(cm){
+  document.getElementById("ultraValue").innerHTML=cm+" <span class='text-sm'>cm</span>";
+  if(cm<20){ setStatus("ultraStatus","alert"); triggerAlert("⚠ DISTANCE WARNING ⚠"); }
+  else if(cm<40){ setStatus("ultraStatus","warning"); }
+  else{ setStatus("ultraStatus","normal"); }
+  logEvent("Ultrasonic Distance: "+cm+" cm");
+}
+
+function updateSound(db){
+  document.getElementById("soundValue").innerHTML=db+" <span class='text-sm'>dB</span>";
+  if(db>80){ setStatus("soundStatus","alert"); triggerAlert("⚠ LOUD SOUND DETECTED ⚠"); }
+  else if(db>60){ setStatus("soundStatus","warning"); }
+  else{ setStatus("soundStatus","normal"); }
+  logEvent("Sound Level: "+db+" dB");
+}
+
+function updateLDR(lux){
+  document.getElementById("ldrValue").innerHTML=lux+" <span class='text-sm'>lux</span>";
+  if(lux<100){ setStatus("ldrStatus","alert"); triggerAlert("⚠ DARKNESS ALERT ⚠"); }
+  else if(lux<300){ setStatus("ldrStatus","warning"); }
+  else{ setStatus("ldrStatus","normal"); }
+  logEvent("Light Level: "+lux+" lux");
+}
+
+function updateMQ2(ppm){
+  document.getElementById("mq2Value").innerHTML=ppm+" <span class='text-sm'>ppm</span>";
+  if(ppm>300){ setStatus("mq2Status","alert"); triggerAlert("⚠ SMOKE / GAS LEAKAGE ⚠"); }
+  else if(ppm>200){ setStatus("mq2Status","warning"); }
+  else{ setStatus("mq2Status","normal"); }
+  logEvent("Gas Level: "+ppm+" ppm");
+}
+</script>
+
+</body>
+</html>
